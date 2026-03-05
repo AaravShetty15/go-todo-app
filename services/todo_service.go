@@ -3,6 +3,7 @@ package services
 import (
 	"github.com/AaravShetty15/go-todo-app/models"
 	"github.com/AaravShetty15/go-todo-app/repository"
+	"errors"
 )
 
 type TodoService struct {
@@ -18,6 +19,15 @@ func NewTodoService(repo *repository.TodoRepository) *TodoService {
 
 // create Todo
 func (s *TodoService) CreateTodo(todo models.Todo) error {
+
+	if todo.Title == "" {
+		return errors.New("title cannot be empty")
+	}
+
+	if len(todo.Description) < 5 {
+		return errors.New("description must be at least 5 characters")
+	}
+
 	return s.Repo.CreateTodo(todo)
 }
 
@@ -33,6 +43,15 @@ func (s *TodoService) GetTodoByID(id int) (models.Todo, error) {
 
 // update Todo
 func (s *TodoService) UpdateTodo(todo models.Todo) error {
+
+	if todo.Title == "" {
+		return errors.New("title cannot be empty")
+	}
+
+	if len(todo.Description) < 5 {
+		return errors.New("description must be at least 5 characters")
+	}
+	
 	return s.Repo.UpdateTodo(todo)
 }
 

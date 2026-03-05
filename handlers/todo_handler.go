@@ -34,9 +34,12 @@ func (h *TodoHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 
 	err = h.Service.CreateTodo(todo)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.WriteJSON(w, http.StatusBadRequest, utils.APIResponse{
+			Success: false,
+			Error:   err.Error(),
+		})
 		return
-	}
+}
 
 	utils.WriteJSON(w, http.StatusCreated, utils.APIResponse{
 	Success: true,

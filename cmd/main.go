@@ -9,16 +9,25 @@ import (
 	"github.com/AaravShetty15/go-todo-app/services"
 	"github.com/AaravShetty15/go-todo-app/handlers"
 	"github.com/AaravShetty15/go-todo-app/routes"
+	"github.com/AaravShetty15/go-todo-app/config"
+	"github.com/joho/godotenv"
 	
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
 
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file found")
+	}
+
+	cfg := config.LoadConfig()
+
 	fmt.Println("Starting Todo API server...")
 
 	// Connect to SQLite database
-	db, err := sql.Open("sqlite3", "./todos.db")
+	db, err := sql.Open("sqlite3", cfg.DBPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,5 +58,5 @@ func main() {
 
 	// Start server
 	fmt.Println("Server running on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":"+cfg.Port, router))
 }

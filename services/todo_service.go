@@ -59,3 +59,7 @@ func (s *TodoService) UpdateTodo(todo models.Todo) error {
 func (s *TodoService) DeleteTodo(id int) error {
 	return s.Repo.DeleteTodo(id)
 }
+
+func (s *TodoService) GetTodosPaginated(limit, offset int) ([]models.Todo, error) {
+	return s.Repo.GetTodosPaginated(limit, offset)
+}

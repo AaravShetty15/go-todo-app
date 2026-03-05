@@ -8,6 +8,7 @@ import (
 	"github.com/AaravShetty15/go-todo-app/utils"
 	"github.com/AaravShetty15/go-todo-app/models"
 	"github.com/AaravShetty15/go-todo-app/services"
+	"github.com/AaravShetty15/go-todo-app/external"
 )
 
 type TodoHandler struct {
@@ -51,15 +52,40 @@ func (h *TodoHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 // GET /todos
 func (h *TodoHandler) GetTodos(w http.ResponseWriter, r *http.Request) {
 
-	todos, err := h.Service.GetTodos()
+	pageStr := r.URL.Query().Get("page")
+	limitStr := r.URL.Query().Get("limit")
+
+	page := 1
+	limit := 5
+
+	if pageStr != "" {
+		p, err := strconv.Atoi(pageStr)
+		if err == nil && p > 0 {
+			page = p
+		}
+	}
+
+	if limitStr != "" {
+		l, err := strconv.Atoi(limitStr)
+		if err == nil && l > 0 {
+			limit = l
+		}
+	}
+
+	offset := (page - 1) * limit
+
+	todos, err := h.Service.GetTodosPaginated(limit, offset)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.APIResponse{
+			Success: false,
+			Error:   err.Error(),
+		})
 		return
 	}
 
 	utils.WriteJSON(w, http.StatusOK, utils.APIResponse{
-	Success: true,
-	Data:    todos,
+		Success: true,
+		Data:    todos,
 	})
 }
 
@@ -136,5 +162,41 @@ func (h *TodoHandler) DeleteTodo(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusOK, utils.APIResponse{
 	Success: true,
 	Message: "Todo deleted successfully",
+	})
+}
+
+func (h *TodoHandler) SuggestTask(w http.ResponseWriter, r *http.Request) {
+
+	task, err := external.GetSuggestedTask()
+	if err != nil {
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.APIResponse{
+			Success: false,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, utils.APIResponse{
+		Success: true,
+		Data:    task,
+	})
+}
+
+func (h *TodoHandler) GetWeather(w http.ResponseWriter, r *http.Request) {
+
+	// Bangalore coordinates example
+	weather, err := external.GetWeather(12.9716, 77.5946)
+
+	if err != nil {
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.APIResponse{
+			Success: false,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, utils.APIResponse{
+		Success: true,
+		Data:    weather,
 	})
 }

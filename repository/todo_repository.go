@@ -119,3 +119,42 @@ func (r *TodoRepository) DeleteTodo(id int) error {
 
 	return err
 }	
+
+func (r *TodoRepository) GetTodosPaginated(limit, offset int) ([]models.Todo, error) {
+
+	query := `
+	SELECT id, title, description, completed, created_at, updated_at
+	FROM todos
+	LIMIT ? OFFSET ?
+	`
+
+	rows, err := r.DB.Query(query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var todos []models.Todo
+
+	for rows.Next() {
+
+		var todo models.Todo
+
+		err := rows.Scan(
+			&todo.ID,
+			&todo.Title,
+			&todo.Description,
+			&todo.Completed,
+			&todo.CreatedAt,
+			&todo.UpdatedAt,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		todos = append(todos, todo)
+	}
+
+	return todos, nil
+}

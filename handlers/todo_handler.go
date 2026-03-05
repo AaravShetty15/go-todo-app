@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"github.com/gorilla/mux"
+	"github.com/AaravShetty15/go-todo-app/utils"
 	"github.com/AaravShetty15/go-todo-app/models"
 	"github.com/AaravShetty15/go-todo-app/services"
 )
@@ -37,8 +38,11 @@ func (h *TodoHandler) CreateTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(todo)
+	utils.WriteJSON(w, http.StatusCreated, utils.APIResponse{
+	Success: true,
+	Message: "Todo created successfully",
+	Data:    todo,
+	})
 }
 
 // GET /todos
@@ -50,7 +54,10 @@ func (h *TodoHandler) GetTodos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(todos)
+	utils.WriteJSON(w, http.StatusOK, utils.APIResponse{
+	Success: true,
+	Data:    todos,
+	})
 }
 
 // GET /todos/{id}
@@ -69,7 +76,10 @@ func (h *TodoHandler) GetTodoByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(todo)
+	utils.WriteJSON(w, http.StatusOK, utils.APIResponse{
+	Success: true,
+	Data:    todo,
+	})
 }
 
 // PUT /todos/{id}
@@ -97,7 +107,11 @@ func (h *TodoHandler) UpdateTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(todo)
+	utils.WriteJSON(w, http.StatusOK, utils.APIResponse{
+	Success: true,
+	Message: "Todo updated successfully",
+	Data:    todo,
+	})
 }
 
 // DELETE /todos/{id}
@@ -116,5 +130,8 @@ func (h *TodoHandler) DeleteTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	utils.WriteJSON(w, http.StatusOK, utils.APIResponse{
+	Success: true,
+	Message: "Todo deleted successfully",
+	})
 }

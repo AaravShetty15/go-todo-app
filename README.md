@@ -7,16 +7,10 @@ A RESTful Todo backend API built in Go using a layered architecture. The applica
 ## Features
 
 - CRUD operations for managing todos
-- Layered architecture (Handlers → Services → Repository)
-- SQLite database
-- Pagination support for listing todos
-- Input validation
-- Standardized JSON API responses
-- Logging middleware
-- Basic Authentication middleware for protected endpoints
-- External API integrations for task suggestions and weather data
-- Environment-based configuration using `.env`
-
+- Layered architecture (Handlers → Services → Repository) with SQLite database
+- Pagination, Input validation and Standardized JSON API responses
+- Logging and Basic Authentication middleware for protected endpoints
+- External API integrations (task suggestions, weather) with Environment-based configuration using `.env`
 ---
 
 ## Project Structure

@@ -85,7 +85,7 @@ AUTH_PASS=password
 ### 1. Clone the repository
 
 ```
-git clone https://github.com/YOUR_USERNAME/go-todo-app.git
+git clone https://github.com/AaravShetty15/go-todo-app.git
 cd go-todo-app
 ```
 
@@ -124,6 +124,143 @@ Body:
   "title": "Learn Go",
   "description": "Build REST APIs",
   "completed": false
+}
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Todo created successfully",
+  "data": {
+    "id": 1,
+    "title": "Learn Go",
+    "description": "Build REST APIs",
+    "completed": false,
+    "created_at": "2026-03-09T12:00:00Z",
+    "updated_at": "2026-03-09T12:00:00Z"
+  }
+}
+```
+
+---
+
+### Get Todos (Pagination)
+
+```
+GET /todos?page=1&limit=2
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "title": "Learn Go",
+      "description": "Build REST APIs",
+      "completed": false
+    },
+    {
+      "id": 2,
+      "title": "Practice Go",
+      "description": "Write more code",
+      "completed": true
+    }
+  ]
+}
+```
+
+---
+
+### Update Todo
+
+```
+PUT /todos/1
+```
+
+Body:
+
+```json
+{
+  "title": "Learn Go Advanced",
+  "description": "Practice building APIs",
+  "completed": true
+}
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Todo updated successfully",
+  "data": {
+    "id": 1,
+    "title": "Learn Go Advanced",
+    "description": "Practice building APIs",
+    "completed": true
+  }
+}
+```
+
+---
+
+### Delete Todo
+
+```
+DELETE /todos/1
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Todo deleted successfully"
+}
+```
+
+---
+
+### Get Task Suggestion
+
+```
+GET /suggest-task
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "activity": "Learn basic origami",
+    "type": "education"
+  }
+}
+```
+
+---
+
+### Get Weather
+
+```
+GET /weather
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "temperature": 27.5,
+    "windspeed": 10.2
+  }
 }
 ```
 

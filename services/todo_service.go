@@ -1,19 +1,27 @@
 package services
 
 import (
+	"context"
+	"encoding/json"
+	"errors"
+	"time"
+	"github.com/redis/go-redis/v9"
 	"github.com/AaravShetty15/go-todo-app/models"
 	"github.com/AaravShetty15/go-todo-app/repository"
-	"errors"
 )
 
 type TodoService struct {
 	Repo *repository.TodoRepository
+	RDB  *redis.Client
+	Ctx  context.Context
 }
 
 // constructor
-func NewTodoService(repo *repository.TodoRepository) *TodoService {
+func NewTodoService(repo *repository.TodoRepository, rdb *redis.Client, ctx context.Context) *TodoService {
 	return &TodoService{
 		Repo: repo,
+		RDB:  rdb,
+		Ctx:  ctx,
 	}
 }
 
@@ -28,7 +36,13 @@ func (s *TodoService) CreateTodo(todo models.Todo) error {
 		return errors.New("description must be at least 5 characters")
 	}
 
-	return s.Repo.CreateTodo(todo)
+	err := s.Repo.CreateTodo(todo)
+
+	if err == nil {
+		s.RDB.Del(s.Ctx, "todos") // clear cache
+	}
+
+	return err
 }
 
 // get All Todos
@@ -51,15 +65,51 @@ func (s *TodoService) UpdateTodo(todo models.Todo) error {
 	if len(todo.Description) < 5 {
 		return errors.New("description must be at least 5 characters")
 	}
-	
-	return s.Repo.UpdateTodo(todo)
+
+	err := s.Repo.UpdateTodo(todo)
+
+	if err == nil {
+		s.RDB.Del(s.Ctx, "todos") // clear cache
+	}
+
+	return err
 }
 
 // delete Todo
 func (s *TodoService) DeleteTodo(id int) error {
-	return s.Repo.DeleteTodo(id)
+
+	err := s.Repo.DeleteTodo(id)
+
+	if err == nil {
+		s.RDB.Del(s.Ctx, "todos") // clear cache
+	}
+
+	return err
 }
 
 func (s *TodoService) GetTodosPaginated(limit, offset int) ([]models.Todo, error) {
-	return s.Repo.GetTodosPaginated(limit, offset)
+
+	cacheKey := "todos"
+
+	val, err := s.RDB.Get(s.Ctx, cacheKey).Result()
+
+	if err == nil {
+
+		var todos []models.Todo
+		json.Unmarshal([]byte(val), &todos)
+
+		return todos, nil
+	}
+
+	todos, err := s.Repo.GetTodosPaginated(limit, offset)
+
+	if err != nil {
+		return nil, err
+	}
+
+	data, _ := json.Marshal(todos)
+
+	s.RDB.Set(s.Ctx, cacheKey, data, 5*time.Minute)
+
+	return todos, nil
 }

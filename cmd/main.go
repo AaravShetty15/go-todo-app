@@ -11,6 +11,8 @@ import (
 	"github.com/AaravShetty15/go-todo-app/routes"
 	"github.com/AaravShetty15/go-todo-app/config"
 	"github.com/joho/godotenv"
+	"github.com/redis/go-redis/v9"
+	"context"
 	
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -32,6 +34,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Redis client
+	ctx := context.Background()
+
+	rdb := redis.NewClient(&redis.Options{ Addr: "localhost:6379",
+	})
+
 	// Create todos table if it doesn't exist
 	createTable := `
 	CREATE TABLE IF NOT EXISTS todos (
@@ -50,7 +58,7 @@ func main() {
 
 	// Initialize layers
 	repo := repository.NewTodoRepository(db)
-	service := services.NewTodoService(repo)
+	service := services.NewTodoService(repo, rdb, ctx)
 	handler := handlers.NewTodoHandler(service)
 
 	// Setup routes
